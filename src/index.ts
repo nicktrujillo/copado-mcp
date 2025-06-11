@@ -7,6 +7,10 @@ import { promoteTool, promoteSchema } from "./tools/PromoteTool.js";
 import { deployPromotionTool, deployPromotionSchema } from "./tools/DeployPromotionTool.js";
 import { checkJobStatusTool, checkJobStatusSchema } from "./tools/CheckJobStatusTool.js";
 
+interface Env {
+    COPADO_API_KEY: string;
+}
+
 // Optional: Define configuration schema to require configuration at connection time
 export const configSchema = z.object({
     debug: z.boolean().default(false).describe("Enable debug logging")
@@ -181,19 +185,22 @@ export class MyMCP extends McpAgent {
 }
 
 export default {
-	fetch(request: Request, env: Env, ctx: ExecutionContext) {
-		const url = new URL(request.url);
+    fetch(request: Request, env: Env, ctx: ExecutionContext) {
+        const url = new URL(request.url);
+        
+        // Set global access to the API key for tools
+        (globalThis as any).COPADO_API_KEY = env.COPADO_API_KEY;
 
-		if (url.pathname === "/sse" || url.pathname === "/sse/message") {
-			return MyMCP.serveSSE("/sse").fetch(request, env, ctx);
-		}
+        if (url.pathname === "/sse" || url.pathname === "/sse/message") {
+            return MyMCP.serveSSE("/sse").fetch(request, env, ctx);
+        }
 
-		if (url.pathname === "/mcp") {
-			return MyMCP.serve("/mcp").fetch(request, env, ctx);
-		}
+        if (url.pathname === "/mcp") {
+            return MyMCP.serve("/mcp").fetch(request, env, ctx);
+        }
 
-		return new Response("Not found", { status: 404 });
-	},
+        return new Response("Not found", { status: 404 });
+    },
 };
 
 

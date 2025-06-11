@@ -12,7 +12,7 @@ export const deployPromotionTool = {
   async execute({ promotionId, apiKey }: DeployPromotionInput) {
     try {
       // Use provided API key or fall back to environment variable
-      const authToken = apiKey || process.env.COPADO_API_KEY;
+      const authToken = apiKey || (globalThis as any).COPADO_API_KEY || process.env.COPADO_API_KEY;
       
       if (!authToken) {
         throw new Error("API key is required. Provide it as a parameter or set COPADO_API_KEY environment variable.");
