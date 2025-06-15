@@ -191,7 +191,7 @@ export const commitTool = {
   async execute({ userStoryId, changesDescription, commitMessage, apiKey }: CommitInput) {
     try {
       // Use provided API key or fall back to environment variable
-      const authToken = apiKey || (globalThis as any).COPADO_API_KEY || process.env.COPADO_API_KEY;
+      const authToken = process.env.COPADO_API_KEY;
       
       if (!authToken) {
         throw new Error("API key is required. Provide it as a parameter or set COPADO_API_KEY environment variable.");
